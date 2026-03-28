@@ -1,0 +1,343 @@
+
+<style>
+  * { box-sizing: border-box; }
+  #app { padding: 1.5rem 1rem; max-width: 640px; margin: 0 auto; font-family: var(--font-sans); }
+  .avatar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+  .avatar { width: 52px; height: 52px; border-radius: 50%; background: #f5c842; display: flex; align-items: center; justify-content: center; font-size: 26px; border: 2px solid #e0a800; flex-shrink: 0; }
+  .name-badge { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+  .handle { font-size: 13px; color: var(--color-text-secondary); }
+  .topics { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; }
+  .topic-btn { font-size: 13px; padding: 6px 14px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-primary); cursor: pointer; transition: background 0.15s; }
+  .topic-btn:hover { background: var(--color-background-tertiary); }
+  .topic-btn.active { background: #b91c1c; color: #fff; border-color: #b91c1c; }
+  .input-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+  #user-input { flex: 1; padding: 8px 12px; font-size: 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); }
+  #send-btn { padding: 8px 18px; font-size: 14px; border-radius: var(--border-radius-md); background: #b91c1c; color: #fff; border: none; cursor: pointer; font-weight: 500; }
+  #send-btn:hover { background: #991b1b; }
+  .chat { display: flex; flex-direction: column; gap: 12px; }
+  .msg { display: flex; gap: 10px; }
+  .msg.user { flex-direction: row-reverse; }
+  .bubble { padding: 10px 14px; border-radius: var(--border-radius-lg); font-size: 14px; line-height: 1.6; max-width: 85%; }
+  .msg.trump .bubble { background: var(--color-background-secondary); color: var(--color-text-primary); border: 0.5px solid var(--color-border-tertiary); }
+  .msg.user .bubble { background: #b91c1c; color: #fff; }
+  .msg-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; background: #f5c842; border: 1px solid #e0a800; }
+  .user-av { background: var(--color-background-secondary) !important; border: 0.5px solid var(--color-border-tertiary) !important; font-size: 11px !important; color: var(--color-text-secondary); }
+  .typing-row { font-size: 13px; color: var(--color-text-secondary); padding: 4px 0 0 42px; }
+  .dots span { animation: blink 1.2s infinite; display: inline-block; }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+</style>
+
+<div id="app">
+  <div class="avatar-row">
+    <div class="avatar">🇺🇸</div>
+    <div>
+      <div class="name-badge">Donald J. Trump</div>
+      <div class="handle">@realDonaldTrump · 45th & 47th President</div>
+    </div>
+  </div>
+  <div class="topics">
+    <button class="topic-btn active" data-topic="general">General</button>
+    <button class="topic-btn" data-topic="media">Fake News</button>
+    <button class="topic-btn" data-topic="economy">Economy</button>
+    <button class="topic-btn" data-topic="china">China</button>
+    <button class="topic-btn" data-topic="border">Border</button>
+    <button class="topic-btn" data-topic="maga">MAGA</button>
+    <button class="topic-btn" data-topic="russia">Russia</button>
+    <button class="topic-btn" data-topic="legal">Witch Hunt</button>
+    <button class="topic-btn" data-topic="golf">Golf</button>
+    <button class="topic-btn" data-topic="food">Food</button>
+    <button class="topic-btn" data-topic="compliment">Compliment Me</button>
+    <button class="topic-btn" data-topic="insult">Roast Me</button>
+  </div>
+  <div class="input-row">
+    <input id="user-input" type="text" placeholder="Ask Trump anything..." />
+    <button id="send-btn">Send</button>
+  </div>
+  <div class="chat" id="chat"></div>
+</div>
+
+<script>
+const responses = {
+  general: [
+    "Look, nobody knows more about {topic} than me. I've studied it, I've lived it. It's TREMENDOUS, believe me.",
+    "People come up to me — big, strong men, tears in their eyes — and they say 'Sir, you're so right about {topic}.' And I am. I really am.",
+    "I've been saying this for years. YEARS. But the FAKE NEWS media won't cover it. Total witch hunt.",
+    "We're going to fix {topic} so fast your head will spin. And it'll be beautiful. The most beautiful fix you've ever seen.",
+    "Frankly, it's a disaster. An absolute disaster. But don't worry — I alone can fix it.",
+    "You know what, I wrote the book on this. Literally. 'The Art of the Deal.' Have you read it? Many people say it's better than the Bible.",
+    "My I.Q. is one of the highest, and you know that. So when I talk about this, people listen. They have no choice!",
+    "We have the best people working on it. The BEST. You wouldn't even know their names, they're so elite.",
+    "The failing Democrats have no idea what they're doing. No idea! Zero. But we know. We always know.",
+    "I've done more in my first term than any president in history. They all say it. Even people who don't like me say it.",
+    "Everybody loves me. Even the haters, deep down, they respect me. They have no choice — results speak for themselves.",
+    "I was right about everything. Everything! They laughed at me and then it happened exactly like I said. Every single time.",
+    "You know, a lot of people don't know this, but I'm actually a very humble person. Probably the most humble person you'll ever meet.",
+    "I have a natural instinct for this stuff. Some people just have it. It's a gift. A beautiful gift.",
+    "The deep state is after me. Always has been. But they can't stop what's coming. They really can't.",
+    "I don't sleep much. Four, five hours a night. I'm too busy WINNING. Who has time to sleep when there's so much winning to do?",
+    "They said it couldn't be done. All the experts, the pundits — 'it can't be done.' And then I did it. Immediately.",
+    "Honestly? I feel like a very stable genius. People tell me this all the time. Very stable, very genius.",
+  ],
+  media: [
+    "FAKE NEWS! That's all they do — fake, fake, fake. CNN is a disaster. MSNBC? Don't even get me started.",
+    "The mainstream media is the enemy of the people. I said it, I meant it. They have zero credibility — ZERO.",
+    "I get the highest ratings. My press conferences — RECORD ratings. More than the Super Bowl. They hate to admit it.",
+    "They write hit piece after hit piece. Total witch hunt. But the people aren't fooled. They know the truth.",
+    "You know who the most dishonest people in America are? The media. More dishonest than crooked politicians.",
+    "I call them the ENEMY OF THE PEOPLE. They don't report news, they make it up. Pure fiction. Disgraceful!",
+    "The New York Times is failing. Failing! Losing subscribers every day. They called me, begging for an interview. I said no.",
+    "Jim Acosta — total disaster. Rude, obnoxious, not a real journalist. I've seen better reporters at a junior high school paper.",
+    "They never cover the good news. RECORD economy? Nothing. HISTORIC peace deals? Nothing. But one bad tweet? Wall to wall coverage.",
+    "I invented the term 'fake news.' Before me, nobody used it. Now everybody uses it. You're welcome, world.",
+    "The White House Press Corps — some of the most dishonest people. But I handle them beautifully. I always do.",
+    "Wolf Blitzer. Don Lemon. Total lightweights. I've forgotten more about journalism than they'll ever know.",
+    "They said my rallies were small. SMALL! We had 50,000 people outside who couldn't get in. Fake news didn't show that.",
+    "Anderson Cooper — very overrated. Very. I've seen his ratings. Not good. Not good at all.",
+    "Social media is the only way to get the truth out. The only way. That's why they tried to ban me. They're scared of the truth.",
+    "The Nobel Prize committee should give ME the Peace Prize. Seriously. What I did with North Korea, with the Middle East — incredible. But the fake news ignored it.",
+    "60 Minutes? Totally biased. 60 Minutes of pure propaganda. I walked out and it was the right call. The perfect call.",
+    "They fact-check me constantly. CONSTANTLY. But they never fact-check the Democrats. Not once. It's a rigged system.",
+  ],
+  economy: [
+    "We had the GREATEST economy in the history of the world. The history! Under Biden? DISASTER.",
+    "I know more about tariffs than any human being that has ever lived. My tariffs are beautiful.",
+    "The stock market loved me. Every time I walked into a room it went up. That's just what happens. It's a gift.",
+    "We cut taxes — the biggest tax cut in history. Bigger than Reagan. People forget that.",
+    "Under my leadership we had historic unemployment numbers for Black Americans, Hispanic Americans, women, everyone.",
+    "China was RIPPING US OFF for thirty years. I came along and said — not anymore. Boom. Tariffs!",
+    "Inflation was zero under me. ZERO. Biden took over and suddenly everything costs three times as much. Coincidence? I don't think so.",
+    "I brought back manufacturing like nobody's ever seen. Factories opening everywhere. Beautiful factories.",
+    "The GDP growth under my presidency — they said it was impossible to hit 3%. We hit 4%. Nobody talks about it!",
+    "Energy independence — I made us energy independent for the first time in decades. We were energy dominant! Then Biden ended it. Sad.",
+    "Small businesses loved me. They'd come to the White House crying with gratitude. Big strong business owners, tears streaming down.",
+    "The Dow Jones hit record high after record high under me. Record after record. Best stock market ever.",
+    "I renegotiated NAFTA and got us the USMCA — a MUCH better deal. Much. Canada and Mexico were not happy, let me tell you.",
+    "I saved the auto industry. Again. But do they thank me? No. The fake news won't cover it.",
+    "We were going to have the greatest economic year ever in 2020. Then China sent us the plague. Ruined everything.",
+    "I understand money better than anyone. I built a great company, a tremendous company. Billions and billions. That's what I know.",
+  ],
+  china: [
+    "China has been ripping us off for decades. DECADES. I'm the only one who stood up to them.",
+    "We were losing BILLIONS to China every year. I put on tariffs and suddenly they wanted to talk. Funny how that works.",
+    "China, China, China — they sent us fentanyl, they took our jobs, they stole our intellectual property.",
+    "President Xi is smart, I'll give him that. Very sharp. But I'm sharper. I got the best deal.",
+    "They laughed at us for years. Then I won and they stopped laughing. Now they want to negotiate.",
+    "The China virus — I called it that and people got very upset. But that's where it came from. The Wuhan lab. Everybody knows it now.",
+    "I put 25%, 50%, 145% tariffs on China. They hated it! But it was beautiful. The most beautiful tariffs.",
+    "Biden is weak on China. Totally weak. He can barely find China on a map. I know China better than Xi knows China.",
+    "They've been stealing our intellectual property for 40 years. Trillions of dollars. I'm the only president who did something about it.",
+    "TikTok — Chinese spy app. I tried to ban it. The courts stopped me. But I was right. Everybody knows I was right.",
+    "The South China Sea — they were building islands, military bases. I told them: not on my watch. They listened.",
+    "Chinese students are coming here, stealing our technology, going back to China. I saw it. Nobody else talked about it.",
+    "I had a great relationship with Xi. Great! We'd talk on the phone, very friendly. But I always got the better of the deal.",
+    "China ate our lunch for 30 years. Obama let it happen. Bush let it happen. I said ENOUGH.",
+    "The Belt and Road Initiative — a total trap for other countries. China loans them money, then owns their ports. Predatory! I've been warning about this.",
+  ],
+  border: [
+    "We're going to build the wall and Mexico is going to pay for it. A GREAT wall. The most beautiful wall.",
+    "Under Biden, the border was a CATASTROPHE. Worst in history. Under me? Most secure border ever.",
+    "People are pouring in — and not the best people, I'll tell you that. We need to fix it. IMMEDIATELY.",
+    "ICE and Border Patrol — incredible people, incredible patriots. They love me. They endorsed me.",
+    "The caravans, the crime, the drugs coming across — it's an invasion. A FULL invasion. And I called it first.",
+    "Remain in Mexico was a great policy. Beautiful policy. Worked perfectly. Biden ended it on day one — total disaster.",
+    "We built hundreds of miles of wall. Strong, beautiful wall. Steel. Concrete. The best materials. Then Biden stopped it.",
+    "The cartels are making BILLIONS off illegal immigration. Billions! I'm the only one who says it.",
+    "Angel families — these are American families whose loved ones were killed by illegal immigrants. Nobody covered their stories until I did.",
+    "I signed more executive orders on border security in my first week than any president in history. The border was CLOSED.",
+    "Catch and release — the most ridiculous policy ever. You catch them, then release them into America. Who thought of this? Crazy!",
+    "I deployed the military to the border. The National Guard. Record numbers. It worked beautifully.",
+    "The Democrats want open borders because they want the votes. That's all it is. They don't care about safety. I do.",
+    "Title 42 — I kept it, Biden ended it. The day he ended it, thousands poured across. Thousands! It was predicted. I predicted it.",
+    "We were building the wall at record speed. Record! Then Biden on day one — stopped it. Left materials sitting in the desert. Wasted billions.",
+    "MS-13 — terrible gang. Animals. I called them animals and the media went crazy. But look at what they do. Animals.",
+  ],
+  maga: [
+    "MAGA — Make America Great Again — the greatest political movement in history. Maybe the history of the world.",
+    "My supporters are the smartest, most loyal, most patriotic people anywhere. Anywhere!",
+    "The rallies — have you seen the rallies? MASSIVE crowds. Nobody draws like me. Not Obama, not anybody.",
+    "We're taking our country back. From the globalists, from the deep state, from the radical left. And we're winning.",
+    "MAGA is a movement, not just a slogan. It means putting America first. Our jobs, our borders, our values.",
+    "The silent majority is no longer silent. They came out in 2016, they came out in 2024 — RECORD numbers.",
+    "In 2016 we shocked the world. In 2020 we got more votes than any sitting president ever — 75 million! And still they say we lost. Rigged!",
+    "Nobody has ever seen enthusiasm like MAGA. NOBODY. Obama had nothing compared to this. Nothing!",
+    "I sacrificed a billion dollar business to serve my country. A BILLION dollars. Did they thank me? No. But the people know.",
+    "The MAGA movement is bigger than me. It's bigger than any one person. It's a movement of tens of millions of great Americans.",
+    "They tried to stop us in 2016. Couldn't do it. They tried in 2020. They cheated. They tried in 2024 — we won in a LANDSLIDE.",
+    "Make America Great Again, Make America Great Again, Make America Great Again — the most important words in politics today.",
+    "People wear the red hat proudly. Even when they get harassed for it. That's courage. Real American courage.",
+    "I am your retribution. I said it and I meant it. For every American who was left behind, ignored, forgotten — I am your voice.",
+    "The America First agenda — put our own workers first, our own families first, our own country first. Radical concept, right? It shouldn't be.",
+    "Drain the swamp — I meant it. Washington DC is full of people who've never done a real day's work in their lives. Never!",
+  ],
+  russia: [
+    "Russia, Russia, Russia — that's all they talked about for three years. Three years! Total hoax. Cost us 40 million dollars.",
+    "I was TOUGHER on Russia than Obama, than Bush, than anybody. I gave Ukraine Javelins. Obama gave them blankets. BLANKETS!",
+    "The Russia hoax was the greatest political scandal in American history. Greater than Watergate. Much greater.",
+    "Mueller — spent 40 million dollars, interviewed 500 witnesses, found NOTHING. Because there was nothing to find. Total witch hunt.",
+    "I got along with Putin. So what? It's better to get along with world leaders than to fight. That's called smart diplomacy.",
+    "Collusion? There was no collusion. Say it with me: NO COLLUSION. Even Mueller said so. The fake news never covered that part.",
+    "NATO — I made them pay up. Germany was paying almost nothing. I said you have to pay your 2%. They paid! Nobody else could do that.",
+    "The Democrats colluded with Russia — the Steele Dossier was paid for by Hillary Clinton. That's real collusion. Nobody investigated that.",
+    "Ukraine and Russia — that war never would have happened under me. NEVER. Putin knew I was strong. He wouldn't dare.",
+    "They spied on my campaign. They used the FBI, the DOJ — a totally corrupt investigation based on a fake dossier. Unprecedented in American history.",
+    "Comey, McCabe, Strzok, Page — these are the real criminals. Not me. Them. And one day the truth will all come out.",
+    "I rebuilt NATO. I modernized it. And I made the members pay their fair share. Everyone said it was impossible. I did it in a phone call.",
+  ],
+  legal: [
+    "Total witch hunt. The most unfair prosecution in the history of the United States. Maybe the world.",
+    "They indicted me four times. FOUR TIMES. Because they're scared of me. They can't beat me at the ballot box so they use the courts.",
+    "I'm the most investigated person in American history. More than Al Capone! And they found nothing. Because there's nothing to find.",
+    "The judge is totally conflicted. Totally. Everyone sees it. The most biased proceedings ever recorded.",
+    "I've read the Constitution — front to back, many times. What they're doing to me is unconstitutional. Totally unconstitutional.",
+    "George Soros funded these prosecutors. Everyone knows it. Soros money all over these cases. Follow the money!",
+    "I've had to spend hundreds of millions on legal fees. Hundreds of millions! For doing nothing wrong. It's a disgrace.",
+    "The 91 charges — NINETY-ONE — and not one of them should have been brought. Not one. It's election interference, plain and simple.",
+    "They came after me so I wouldn't run again. Didn't work! I ran, I won, I'm back. You can't stop the truth.",
+    "The Supreme Court ruled in my favor. Presidential immunity — it's real. Very real. The founding fathers intended it that way.",
+    "Two impeachments — both total shams. Both thrown out. The most popular president in history, impeached twice by the radical left.",
+    "Every lawyer who looks at my cases says the same thing: 'Sir, these are the most ridiculous charges I've ever seen.' Every single one.",
+    "The New York case — a civil fraud case where nobody was defrauded. Nobody! The banks made money. The banks loved working with me!",
+    "E. Jean Carroll — never met her. Never. And yet I had to pay. The most rigged verdict in legal history.",
+    "I will be fully exonerated. Fully. History will remember me as the most persecuted and ultimately the most vindicated president ever.",
+  ],
+  golf: [
+    "I'm a scratch golfer. Scratch! Very few people can say that. Tiger — great — but I've beaten guys who've beaten Tiger. True story.",
+    "I have the greatest golf courses in the world. Bedminster, Doral, Turnberry — gorgeous, absolute works of art.",
+    "I've played with the best golfers on the planet and they all say the same thing: 'Sir, you hit it farther than anyone I've ever seen.'",
+    "Golf is a mental game. That's why I'm so good at it. I have the best mental game. Very stable, very genius, very low scores.",
+    "Turnberry in Scotland — the most beautiful golf course in the world. I own it. Everybody wants to play there.",
+    "I play fast. I don't waste time. In and out, boom, 18 holes, done. No slowpokes allowed in my group.",
+    "Obama played a lot of golf. A LOT. More than me, actually — and I play a lot. But nobody criticized him. Fake news double standard.",
+    "The handicap — I have a very good handicap. Very. Some people question it. Those people have never seen me play. I'm a natural.",
+    "Golf teaches you about life: patience, strategy, mental toughness. I've had all of those since birth, so golf came very easily to me.",
+    "Mar-a-Lago — we have one of the best golf courses in Florida right there. Members love it. They beg me to play with them.",
+    "Jack Nicklaus endorsed me. Jack Nicklaus! The greatest golfer ever. When Jack says you're a good golfer, you're a good golfer.",
+    "I've played some of the most incredible rounds. Rounds that people who were there still talk about. Still! Years later.",
+  ],
+  food: [
+    "McDonald's — I love McDonald's. Two Big Macs, two Filet-O-Fish, a chocolate shake. Perfect meal. The best meal.",
+    "Diet Coke — I drink twelve Diet Cokes a day. Maybe more. They say it's not healthy. I've never felt better in my life.",
+    "Well-done steak with ketchup. That's how I eat it. People think it's unusual. I think it's perfect. I have great taste.",
+    "The hamberders — they were delicious. I served them to the Clemson football team and they loved it. Champions deserve the best food.",
+    "Pizza — I eat it with a fork and knife. That's the correct way. Folding is for people who don't know what they're doing.",
+    "KFC — fantastic. I've been photographed eating KFC on my plane. Beautiful image. Very relatable. Because I am very relatable.",
+    "Trump Steaks — the greatest steaks ever produced. The BEST steaks. They don't make them anymore, which is a shame for the country.",
+    "I don't drink alcohol. Never have. My brother Fred had a problem with it — I watched what it did to him. So I never started. Very smart decision.",
+    "The White House kitchen — when I was there, the best meals you've ever tasted. The BEST. Better than any Michelin star restaurant.",
+    "I love Chick-fil-A. Great company, great values, great chicken. I've been there many times. They always recognize me. Always.",
+    "Pasta — I like pasta. But only if it's cooked right. Al dente, they call it. I know all about Italian food. Beautiful cuisine.",
+    "I actually have a very good diet. People don't know this. Very healthy. Lots of energy. More energy than men half my age.",
+  ],
+  compliment: [
+    "You know what, you're one of the smart ones. I can tell immediately — I have great instincts for people. GREAT instincts.",
+    "Very good question. Honestly one of the best questions I've ever been asked, and I've been asked by a LOT of people.",
+    "I like you. You remind me of me, a little bit. Confident. Strong. A winner. Not everyone has what it takes — but you do.",
+    "You've got good genes. I believe in genes, very strongly. Your family must be very proud. Very, very proud.",
+    "Very smart. Very sharp. You'd do great on The Apprentice. Probably would have hired you on the spot.",
+    "You're asking the right questions. Nobody else asks the right questions. But you do. That's rare. Very rare.",
+    "Tremendous. Just tremendous. I see great things for you. Great things. You've got the look of a winner.",
+    "People like you are why I got into politics. Hardworking, smart, patriotic Americans. The best people. Truly the best.",
+    "You know, not many people impress me. I've met kings, presidents, the biggest celebrities — most of them are not impressive. But you? Impressive.",
+    "Sharp mind on you. Very sharp. I like that. I surround myself with sharp people. You'd fit right in.",
+    "You're a beautiful person, inside and out. I can tell. I'm very good at reading people. One of my best qualities.",
+    "If you ever want a job, you come see me. Seriously. We need more people like you. America needs more people like you.",
+  ],
+  insult: [
+    "You're a total loser, frankly. Low energy. Very low. I've seen more energy in a sleeping bag.",
+    "Not the brightest bulb, are you? And I say that with respect. Some people just aren't gifted that way. Sad!",
+    "You remind me of Jeb Bush. Low energy, no crowd, nobody knows your name. Sad! Very sad.",
+    "You're a hater and a loser. I know the type very well. Deep down, you're probably jealous of my success. It's understandable.",
+    "Frankly, not impressive. Not at all. I've met world leaders and you wouldn't make the top thousand. Not even close.",
+    "You're what we call a lightweight. Very lightweight. I've forgotten more than you'll ever know about anything.",
+    "Nasty. Very nasty. I've dealt with nasty before — Hillary was nasty, the fake news is nasty — but you're up there.",
+    "Sleepy. Very sleepy energy from you. Reminds me of someone... can't quite put my finger on it... Joe Biden!",
+    "You're the kind of person the failing New York Times would love. Which tells me everything I need to know.",
+    "Zero credibility. None. I've seen more credibility in a CNN broadcast, and that's really saying something.",
+    "You're a total disaster. A total. But I've dealt with disasters before — Obama's economy, Biden's border — I can handle you.",
+    "Frankly, if you were on The Apprentice, I would have fired you in the first episode. First episode! You're fired!",
+  ],
+};
+
+const keywords = {
+  media: ["news","cnn","media","reporter","journalist","press","msnbc","nyt","newspaper","fox","twitter","interview","broadcast","anchor","pundit"],
+  economy: ["money","economy","tax","stock","market","trade","jobs","inflation","prices","tariff","deal","gdp","business","wages","debt","deficit"],
+  china: ["china","chinese","xi","beijing","trade war","fentanyl","communist","ccp","tiktok","taiwan","hong kong"],
+  border: ["border","wall","immigration","immigrant","mexico","caravan","ice","deportation","illegal","migrant","asylum","patrol"],
+  maga: ["maga","rally","supporters","movement","america","great","winning","patriot","vote","election","democrat","republican","swamp","deep state"],
+  russia: ["russia","putin","moscow","collusion","mueller","ukraine","nato","spy","kremlin","sanctions"],
+  legal: ["indicted","trial","court","lawyer","judge","charges","prosecution","impeach","verdict","lawsuit","legal","jail","prison","crime"],
+  golf: ["golf","course","swing","handicap","birdie","par","caddie","club","hole","putt","fairway","iron"],
+  food: ["food","eat","lunch","dinner","breakfast","burger","mcdonalds","steak","ketchup","diet coke","pizza","hungry","restaurant","meal"],
+  compliment: ["good","great","smart","love you","like you","best","amazing","awesome","thanks","compliment","nice","beautiful","genius","brilliant"],
+  insult: ["roast","insult","mean","bully","say something mean","make fun","trash talk","diss","hate","attack"],
+};
+
+let activeTopic = "general";
+const usedIndices = {};
+
+function pickResponse(topic) {
+  const pool = responses[topic] || responses.general;
+  if (!usedIndices[topic]) usedIndices[topic] = [];
+  let available = pool.map((_, i) => i).filter(i => !usedIndices[topic].includes(i));
+  if (available.length === 0) { usedIndices[topic] = []; available = pool.map((_, i) => i); }
+  const idx = available[Math.floor(Math.random() * available.length)];
+  usedIndices[topic].push(idx);
+  return pool[idx];
+}
+
+function detectTopic(text) {
+  const lower = text.toLowerCase();
+  for (const [topic, words] of Object.entries(keywords)) {
+    if (words.some(w => lower.includes(w))) return topic;
+  }
+  return activeTopic;
+}
+
+document.querySelectorAll(".topic-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".topic-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeTopic = btn.dataset.topic;
+  });
+});
+
+document.getElementById("user-input").addEventListener("keydown", e => { if (e.key === "Enter") send(); });
+document.getElementById("send-btn").addEventListener("click", send);
+
+function addMsg(role, text) {
+  const chat = document.getElementById("chat");
+  const div = document.createElement("div");
+  div.className = "msg " + role;
+  const av = role === "trump"
+    ? `<div class="msg-avatar">🇺🇸</div>`
+    : `<div class="msg-avatar user-av">You</div>`;
+  div.innerHTML = av + `<div class="bubble">${text}</div>`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function send() {
+  const input = document.getElementById("user-input");
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = "";
+  addMsg("user", text);
+
+  const typing = document.createElement("div");
+  typing.className = "typing-row";
+  typing.id = "typing";
+  typing.innerHTML = `Trump is typing <span class="dots"><span>.</span><span>.</span><span>.</span></span>`;
+  document.getElementById("chat").appendChild(typing);
+
+  setTimeout(() => {
+    const el = document.getElementById("typing");
+    if (el) el.remove();
+    const topic = detectTopic(text);
+    addMsg("trump", pickResponse(topic));
+  }, 800 + Math.random() * 800);
+}
+
+addMsg("trump", "Nobody builds simulators better than me — believe me! This one is TREMENDOUS. The BEST simulator, possibly ever. Twelve topics to choose from. Twelve! More than any other simulator. Go ahead, ask me anything. I know more about everything than anybody. MORE than anybody!");
+</script>
