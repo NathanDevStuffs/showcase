@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>STEM Game Showcase</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue:        #4285f4;
+    --blue-hover:  #3367d6;
+    --blue-light:  #eaf1ff;
+    --blue-ring:   rgba(66,133,244,0.22);
+    --green:       #1e8e3e;
+    --green-light: #e6f4ea;
+    --green-border:#a8d5b5;
+    --text:        #1f2023;
+    --text-sub:    #6b7280;
+    --border:      #e3e6ea;
+    --bg:          #f3f4f6;
+    --surface:     #ffffff;
+    --radius-lg:   18px;
+    --radius-md:   12px;
+    --radius-sm:   8px;
+    --shadow-sm:   0 1px 4px rgba(0,0,0,0.07);
+    --shadow-md:   0 4px 16px rgba(0,0,0,0.09);
+    --sidebar-w:   272px;
+    --header-h:    62px;
+    --font:        'Nunito', sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─────────────── LOGIN ─────────────── */
+  #loginScreen {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 48px 40px 40px;
+    width: 420px;
+    box-shadow: var(--shadow-md);
+    animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.94) translateY(12px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .login-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .login-icon {
+    width: 56px; height: 56px;
+    background: var(--blue-light);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    margin: 0 auto 18px;
+  }
+
+  .login-header h2 {
+    font-size: 22px; font-weight: 700;
+    color: var(--text); margin-bottom: 6px;
+  }
+
+  .login-header p {
+    font-size: 14px; color: var(--text-sub);
+  }
+
+  .form-label {
+    display: block;
+    font-size: 13px; font-weight: 600;
+    color: var(--text-sub);
+    margin-bottom: 7px;
+  }
+
+  .styled-select {
+    width: 100%;
+    padding: 13px 40px 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    font-family: var(--font);
+    font-size: 14px; font-weight: 500;
+    color: var(--text);
+    background: var(--surface);
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath fill='%236b7280' d='M1 1l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .styled-select:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-ring);
+  }
+
+  .btn-main {
+    width: 100%; padding: 13px;
+    background: var(--blue); color: white;
+    border: none; border-radius: var(--radius-md);
+    font-family: var(--font); font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    margin-top: 18px;
+  }
+  .btn-main:hover:not(:disabled) {
+    background: var(--blue-hover);
+    box-shadow: 0 4px 12px rgba(66,133,244,0.35);
+    transform: translateY(-1px);
+  }
+  .btn-main:active:not(:disabled) { transform: translateY(0); }
+  .btn-main:disabled { background: #a8c4f8; cursor: not-allowed; }
+
+  .login-note {
+    font-size: 12px; color: var(--text-sub);
+    text-align: center; margin-top: 18px; line-height: 1.7;
+  }
+
+  /* ─────────────── HEADER ─────────────── */
+  header {
+    height: var(--header-h);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 20px 0 24px; gap: 14px;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+    z-index: 10;
+  }
+
+  .header-icon {
+    width: 34px; height: 34px;
+    background: var(--blue-light);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+  }
+
+  .header-title {
+    font-size: 17px; font-weight: 700; color: var(--text);
+  }
+
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+  .user-chip {
+    display: flex; align-items: center; gap: 9px;
+    padding: 5px 14px 5px 5px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+  }
+
+  .avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--blue); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+
+  .btn-signout {
+    padding: 7px 16px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    font-family: var(--font); font-size: 13px; font-weight: 600;
+    color: var(--text-sub); cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .btn-signout:hover {
+    background: var(--bg); border-color: #c5cad2; color: var(--text);
+  }
+
+  /* ─────────────── LAYOUT ─────────────── */
+  .layout { display: flex; flex: 1; overflow: hidden; gap: 0; }
+
+  /* ─────────────── SIDEBAR ─────────────── */
+  aside {
+    width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    flex-shrink: 0; overflow: hidden;
+  }
+
+  .section-label {
+    padding: 18px 18px 8px;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--text-sub);
+  }
+
+  .game-list { flex: 1; overflow-y: auto; padding: 4px 10px 10px; }
+  .game-list::-webkit-scrollbar { width: 5px; }
+  .game-list::-webkit-scrollbar-thumb { background: #dde0e5; border-radius: 3px; }
+
+  .game-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.12s;
+    margin-bottom: 2px;
+  }
+  .game-item:hover { background: var(--bg); }
+  .game-item.active { background: var(--blue-light); }
+
+  .g-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; background: var(--bg); flex-shrink: 0;
+    transition: background 0.12s;
+  }
+  .game-item.active .g-icon { background: white; }
+  .game-item:hover:not(.active) .g-icon { background: #eceef2; }
+
+  .g-info { flex: 1; min-width: 0; }
+  .g-name {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .game-item.active .g-name { color: var(--blue); }
+  .g-author {
+    font-size: 11px; font-weight: 500; color: var(--text-sub);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-top: 1px;
+  }
+
+  /* ─────────────── VOTE PANEL ─────────────── */
+  .vote-panel {
+    margin: 0 10px 12px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+  }
+
+  .vote-panel-title {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .vote-select-wrap { position: relative; margin-bottom: 10px; }
+  .vote-select-wrap select {
+    width: 100%;
+    padding: 10px 34px 10px 13px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font); font-size: 13px; font-weight: 600;
+    color: var(--text); background: white;
+    outline: none; cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .vote-select-wrap select:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-ring);
+  }
+
+  .btn-vote {
+    width: 100%; padding: 10px;
+    background: var(--blue); color: white;
+    border: none; border-radius: var(--radius-sm);
+    font-family: var(--font); font-size: 13px; font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+  }
+  .btn-vote:hover:not(:disabled) {
+    background: var(--blue-hover);
+    box-shadow: 0 3px 10px rgba(66,133,244,0.3);
+    transform: translateY(-1px);
+  }
+  .btn-vote:disabled { background: #a8c4f8; cursor: not-allowed; transform: none; }
+
+  .voted-confirm {
+    display: flex; align-items: center; gap: 9px;
+    padding: 11px 13px;
+    background: var(--green-light);
+    border: 1.5px solid var(--green-border);
+    border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 700; color: var(--green);
+  }
+
+  /* ─────────────── MAIN ─────────────── */
+  main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar {
+    padding: 14px 22px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+  }
+  .topbar h2 { font-size: 16px; font-weight: 700; flex: 1; }
+  .anon-pill {
+    font-size: 12px; font-weight: 600; color: var(--text-sub);
+    background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 999px; padding: 4px 12px;
+  }
+
+  .iframe-area {
+    flex: 1; padding: 16px 20px 20px;
+    display: flex; overflow: hidden;
+  }
+
+  iframe {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: white;
+    box-shadow: var(--shadow-md);
+  }
+
+  .empty-state {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px; text-align: center;
+  }
+  .empty-icon {
+    width: 72px; height: 72px; border-radius: 22px;
+    background: var(--blue-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+  }
+  .empty-state h3 { font-size: 17px; font-weight: 700; color: var(--text); }
+  .empty-state p  { font-size: 13px; font-weight: 500; color: var(--text-sub); }
+
+  /* ─────────────── TOAST ─────────────── */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #2d3038; color: white;
+    padding: 12px 22px; border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 9999; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-icon">🎮</div>
+      <h2>STEM Game Showcase</h2>
+      <p>Check your name from the list and begin playing >:)</p>
+    </div>
+    <label class="form-label" for="studentSelect">Your name</label>
+    <select class="styled-select" id="studentSelect" onchange="onSelectChange()">
+      <option value="">— Select your name —</option>
+    </select>
+    <button class="btn-main" id="loginBtn" onclick="login()" disabled>Continue</button>
+
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none; flex-direction:column; height:100vh;">
+
+  <header>
+    <div class="header-icon">🏆</div>
+    <span class="header-title">STEM Game Showcase</span>
+    <div class="header-right">
+      <div class="user-chip">
+        <div class="avatar" id="headerAvatar"></div>
+        <span id="headerName"></span>
+      </div>
+      <button class="btn-signout" onclick="signOut()">Sign out</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <div class="section-label">Games</div>
+      <div class="game-list" id="gameList"></div>
+
+      <div class="vote-panel">
+        <div class="vote-panel-title">🗳️ Cast Your Vote</div>
+        <div id="voteForm">
+          <div class="vote-select-wrap">
+            <select id="voteSelect">
+              <option value="">— Pick your favourite —</option>
+            </select>
+          </div>
+          <button class="btn-vote" id="voteBtn" onclick="submitVote()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Submit Vote
+          </button>
+        </div>
+        <div class="voted-confirm" id="votedConfirm" style="display:none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Vote submitted — thanks!
+        </div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="topbar" id="topbar" style="display:none">
+        <h2 id="activeTitle"></h2>
+        <span class="anon-pill" style="display: none;">👤 Anonymous Student</span>
+      </div>
+      <div class="iframe-area">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">🎮</div>
+          <h3>Pick a game to play</h3>
+          <p>Select a classmate's game from the sidebar.</p>
+        </div>
+        <iframe id="gameFrame" style="display:none" allowfullscreen></iframe>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ═══════════════════════════════════════════════════
+  // 🔧 PASTE YOUR DISCORD WEBHOOK URL BELOW
+  // ═══════════════════════════════════════════════════
+  const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1487281443821584495/7WAHLuWfQhh9TX4OkIUAm3u3ie1TRrPcnMQEtvsgD5KKPMFCl4V4NKBcxygkZ4xeMLOX";
+
+  // ═══════════════════════════════════════════════════
+  // 🎮 ADD YOUR STUDENTS HERE
+  // name → student's real name (shown on login only)
+  // file → path to their HTML game file
+  // icon → emoji shown in sidebar
+  // ═══════════════════════════════════════════════════
+const STUDENTS = [
+    { name: "Aaron",   file: "games/aaron.html",   icon: "🛡️" },
+    { name: "Nick",    file: "games/nick.html",    icon: "🏹" },
+    { name: "Matt",    file: "games/matt.html",    icon: "🕹️" },
+    { name: "Mao",     file: "games/mao.html",     icon: "🔮" },
+    { name: "Eric",    file: "games/eric.html",    icon: "⚡" },
+    { name: "Rocky",   file: "games/rocky.html",   icon: "⛰️" },
+    { name: "Freddy",  file: "games/freddy.html",  icon: "🍕" },
+    { name: "DL",      file: "games/dl.html",      icon: "💎" },
+    { name: "Derrick", file: "games/derrick.html", icon: "🐉" },
+  ];
+  // ═══════════════════════════════════════════════════
+
+  let currentUser = null;
+  let hasVoted    = false;
+  let activeIndex = null;
+
+  // Populate login dropdown
+  const loginSel = document.getElementById('studentSelect');
+  STUDENTS.forEach((s, i) => {
+    const o = document.createElement('option');
+    o.value = i; o.textContent = s.name;
+    loginSel.appendChild(o);
+  });
+
+  function onSelectChange() {
+    document.getElementById('loginBtn').disabled = loginSel.value === '';
+  }
+
+  function login() {
+    const idx = parseInt(loginSel.value);
+    if (isNaN(idx)) return;
+    currentUser = { ...STUDENTS[idx], index: idx };
+    hasVoted = localStorage.getItem('stem_voted_' + currentUser.name) === 'true';
+
+    document.getElementById('loginScreen').style.display = 'none';
+    const app = document.getElementById('app');
+    app.style.display = 'flex';
+
+    document.getElementById('headerName').textContent = currentUser.name;
+    document.getElementById('headerAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+
+    renderSidebar();
+    renderVotePanel();
+  }
+
+  function signOut() {
+    currentUser = null; activeIndex = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    loginSel.value = '';
+    document.getElementById('loginBtn').disabled = true;
+    document.getElementById('gameFrame').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'flex';
+    document.getElementById('topbar').style.display = 'none';
+  }
+
+  function renderSidebar() {
+    const list = document.getElementById('gameList');
+    list.innerHTML = '';
+    STUDENTS.forEach((s, i) => {
+      if (i === currentUser.index) return;
+      const el = document.createElement('div');
+      el.className = 'game-item' + (i === activeIndex ? ' active' : '');
+      el.innerHTML = `
+        <div class="g-icon">${s.icon}</div>
+        <div class="g-info">
+          <div class="g-name">${s.name.split(' ')[0]}'s Game</div>
+          <div class="g-author">by ${s.name}</div>
+        </div>`;
+      el.onclick = () => loadGame(i);
+      list.appendChild(el);
+    });
+  }
+
+  function renderVotePanel() {
+    const vs = document.getElementById('voteSelect');
+    vs.innerHTML = '<option value="">— Pick your favourite —</option>';
+    STUDENTS.forEach((s, i) => {
+      if (i === currentUser.index) return;
+      const o = document.createElement('option');
+      o.value = i;
+      o.textContent = s.name.split(' ')[0] + "'s Game";
+      vs.appendChild(o);
+    });
+
+    if (hasVoted) {
+      document.getElementById('voteForm').style.display = 'none';
+      document.getElementById('votedConfirm').style.display = 'flex';
+    } else {
+      document.getElementById('voteForm').style.display = 'block';
+      document.getElementById('votedConfirm').style.display = 'none';
+    }
+  }
+
+  function loadGame(index) {
+    activeIndex = index;
+    const game = STUDENTS[index];
+    document.getElementById('activeTitle').textContent = game.icon + '  ' + game.name.split(' ')[0] + "'s Game";
+    document.getElementById('topbar').style.display = 'flex';
+    document.getElementById('emptyState').style.display = 'none';
+    const frame = document.getElementById('gameFrame');
+    frame.src = game.file;
+    frame.style.display = 'block';
+    renderSidebar();
+  }
+
+  async function submitVote() {
+    if (hasVoted) return;
+    const vs = document.getElementById('voteSelect');
+    const idx = parseInt(vs.value);
+    if (isNaN(idx) || vs.value === '') {
+      showToast('Please select a game first.');
+      return;
+    }
+
+    const votedFor = STUDENTS[idx];
+    const ts = new Date().toLocaleString('en-CA', { dateStyle: 'medium', timeStyle: 'short' });
+    const initials = currentUser.name.split(' ').map(n => n[0]).join('');
+
+    const payload = {
+      embeds: [{
+        title: "🗳️ New Vote Received!",
+        color: 0x4285f4,
+        fields: [
+          { name: "Voter",     value: `Student (${initials})`,                    inline: true },
+          { name: "Voted For", value: `${votedFor.icon} ${votedFor.name}'s Game`, inline: true },
+          { name: "Time",      value: ts,                                          inline: false }
+        ],
+        footer: { text: "STEM Game Showcase" }
+      }]
+    };
+
+    const btn = document.getElementById('voteBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    try {
+      const res = await fetch(DISCORD_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok || res.status === 204) {
+        hasVoted = true;
+        localStorage.setItem('stem_voted_' + currentUser.name, 'true');
+        document.getElementById('voteForm').style.display = 'none';
+        document.getElementById('votedConfirm').style.display = 'flex';
+        showToast('✅ Vote submitted!');
+        renderSidebar();
+      } else {
+        throw new Error('bad response');
+      }
+    } catch {
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Submit Vote`;
+      showToast('⚠️ Could not submit — check your webhook URL.');
+    }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+</script>
+</body>
+</html>
